@@ -130,7 +130,7 @@ class TLDetector(object):
 
         """
         if self.config['is_site']:
-
+            rospy.loginfo("vehicle is running at site!")
             if not self.has_image:
                 self.prev_light_loc = None
                 return False
@@ -141,6 +141,7 @@ class TLDetector(object):
             return self.light_classifier.get_classification(cv_image)
         else:
             # For testing , light state is given
+            rospy.loginfo("vehicle is running in simulation!")
             return light.state
 
     def process_traffic_lights(self):
