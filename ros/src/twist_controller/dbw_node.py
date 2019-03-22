@@ -55,7 +55,6 @@ class DBWNode(object):
         self.brake_pub = rospy.Publisher('/vehicle/brake_cmd',
                                          BrakeCmd, queue_size=1)
 
-        # TODO: Create `Controller` object
         self.controller = Controller(
             vehicle_mass = vehicle_mass,
             fuel_capacity = fuel_capacity,
@@ -95,6 +94,7 @@ class DBWNode(object):
                 )
             if self.dbw_enabled:
                 self.publish(self.throttle, self.brake, self.steering)
+            rate.sleep()
 
     def dbw_enabled_cb(self, msg):
         self.dbw_enabled = msg
