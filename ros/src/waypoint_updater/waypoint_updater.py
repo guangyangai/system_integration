@@ -118,7 +118,7 @@ class WaypointUpdater(object):
             if vel < 1.:
                 vel = 0.
             # do not go over vel limit
-            p.twist.twist.linear.x = min(vel, wp.twist.twist.liner.x)
+            p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
             temp.append(p)
 
         return temp
