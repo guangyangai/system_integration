@@ -59,20 +59,25 @@ class Controller(object):
         rospy.loginfo("Current vel: {}".format(current_vel))
 
         steer = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
+        rospy.loginfo("Steer from yaw controller: {}".format(steer))
+
         vel_error = linear_vel - current_vel
         self.last_vel = current_vel
 
         current_time = rospy.get_time()
-        sample_time = current_vel - self.last_time
+        sample_time = current_time - self.last_time
         self.last_time = current_time
 
         throttle = self.throttle_controller.step(vel_error, sample_time)
+        rospy.loginfo("Throttle from PID: {}".format(throttle))
         brake = 0
 
         if linear_vel == 0. and current_vel < STOP_SPEED:
+            rospy.logwarn("Target vel is 0, need to stop!")
             throttle = 0
             brake = BRAKE
         elif throttle < MN_THROTTLE and vel_error < 0:
+            rospy.logwarn("Moving faster than target vel, need to slow down!")
             throttle = 0
             decel = max(vel_error, self.decel_limit)
             brake = abs(decel) * self.vehicle_mass * self.wheel_radius
