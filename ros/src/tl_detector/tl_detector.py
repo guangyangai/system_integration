@@ -128,18 +128,7 @@ class TLDetector(object):
         Returns:
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
-        """
-
-        # if not self.has_image:
-        #     self.prev_light_loc = None
-        #     return False
-        # if self.config['is_site']:
-        #     rospy.loginfo("vehicle is running at site!")
-        # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-        #
-        # # Get classification
-        # return self.light_classifier.get_classification(cv_image)
-
+        """          
         return light.state
 
     def process_traffic_lights(self):
@@ -173,10 +162,20 @@ class TLDetector(object):
         if closest_light:
             state = self.get_light_state(closest_light)
             return line_wp_idx, state
+        else:
+            if not self.has_image:
+                self.prev_light_loc = None
+                return -1, TrafficLight.UNKNOWN
+            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+            # Get classification
+            if self.config['is_site']:
+                rospy.loginfo("vehicle is running at site!")
+                return -1, self.light_classifier.get_classification(cv_image)  
+            else:
+                rospy.loginfo("vehicle is running in highway!")
+                return -1, self.light_classifier.get_classification(cv_image)  
 
-        return -1, TrafficLight.UNKNOWN
-
-
+            
 if __name__ == '__main__':
     try:
         TLDetector()
