@@ -128,8 +128,25 @@ class TLDetector(object):
         Returns:
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
-        """          
-        return light.state
+        """
+        try:
+            state = light.state
+        except:
+            rospy.logwarn("light state is not provided!using classifier...")
+            if not self.has_image:
+                # self.prev_light_loc = None
+                state = TrafficLight.UNKNOWN
+            else:
+                cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+                # Get classification
+                if self.config['is_site']:
+                    rospy.loginfo("vehicle is running at site!")
+                    # use light.pose.pose.position.x, light.pose.pose.position.y?
+                    state = self.light_classifier.get_classification(cv_image)  
+                else:
+                    rospy.loginfo("vehicle is running in highway!")
+                    state = self.light_classifier.get_classification(cv_image)  
+        return state
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
@@ -162,18 +179,7 @@ class TLDetector(object):
         if closest_light:
             state = self.get_light_state(closest_light)
             return line_wp_idx, state
-        else:
-            if not self.has_image:
-                self.prev_light_loc = None
-                return -1, TrafficLight.UNKNOWN
-            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-            # Get classification
-            if self.config['is_site']:
-                rospy.loginfo("vehicle is running at site!")
-                return -1, self.light_classifier.get_classification(cv_image)  
-            else:
-                rospy.loginfo("vehicle is running in highway!")
-                return -1, self.light_classifier.get_classification(cv_image)  
+        return -1, TrafficLight.UNKNOWN
 
             
 if __name__ == '__main__':
