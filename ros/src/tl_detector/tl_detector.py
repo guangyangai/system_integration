@@ -135,17 +135,16 @@ class TLDetector(object):
             rospy.logwarn("light state is not provided!using classifier...")
             if not self.has_image:
                 # self.prev_light_loc = None
+                rospy.logwarn("No camera image!")
                 state = TrafficLight.UNKNOWN
             else:
                 cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
                 # Get classification
                 if self.config['is_site']:
                     rospy.loginfo("vehicle is running at site!")
-                    # use light.pose.pose.position.x, light.pose.pose.position.y?
-                    state = self.light_classifier.get_classification(cv_image)  
                 else:
                     rospy.loginfo("vehicle is running in highway!")
-                    state = self.light_classifier.get_classification(cv_image)  
+                state = self.light_classifier.get_classification(cv_image)  
         return state
 
     def process_traffic_lights(self):
