@@ -20,12 +20,13 @@ class TLClassifier(object):
             with tf.gfile.GFile(graph_path, 'rb') as f:
                 graph_def.ParseFromString(f.read())
                 tf.import_graph_def(graph_def, name='tl_classifier')
-                
-            self.image_tensor = self.graph.get_tensor_by_name('image_tensor:0')
-            self.boxes = self.graph.get_tensor_by_name('detection_boxes:0')
-            self.scores = self.graph.get_tensor_by_name('detection_scores:0')
-            self.classes = self.graph.get_tensor_by_name('detection_classes:0')
-            self.num_detections = self.graph.get_tensor_by_name('num_detections:0')
+            # for op in self.graph.get_operations():
+                # print(op.name)
+            self.image_tensor = self.graph.get_tensor_by_name('tl_classifier/image_tensor:0')
+            self.boxes = self.graph.get_tensor_by_name('tl_classifier/detection_boxes:0')
+            self.scores = self.graph.get_tensor_by_name('tl_classifier/detection_scores:0')
+            self.classes = self.graph.get_tensor_by_name('tl_classifier/detection_classes:0')
+            self.num_detections = self.graph.get_tensor_by_name('tl_classifier/num_detections:0')
             
         self.sess = tf.Session(graph=self.graph)
         self.light_code_dict = {1: TrafficLight.GREEN, 2: TrafficLight.RED, 3: TrafficLight.YELLOW, 4: TrafficLight.UNKNOWN}
